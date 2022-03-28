@@ -1,0 +1,3 @@
+name: DependencyPlugin
+version: test
+main: voidpointer.spigot.framework.di.DependencyPlugin
