@@ -127,6 +127,7 @@ public final class Injector {
 
     private static Object getFieldValue(final Field field, final Object obj, final Logger logger) {
         try {
+            field.setAccessible(true);
             return field.get(obj);
         } catch (Exception exception) {
             logger.log(Level.WARNING, "Unable to get @Dependency value", exception);
