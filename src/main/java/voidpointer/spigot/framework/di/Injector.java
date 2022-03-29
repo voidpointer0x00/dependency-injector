@@ -99,7 +99,7 @@ public final class Injector {
     private static ImmutableSet<ClassInfo> getClasses(final JavaPlugin plugin) {
         try {
             return ClassPath.from(plugin.getClass().getClassLoader())
-                    .getTopLevelClassesRecursive(plugin.getClass().getPackageName());
+                    .getTopLevelClassesRecursive(plugin.getClass().getPackage().getName());
         } catch (IOException ioException) {
             plugin.getLogger().log(Level.WARNING, "Can't inject any @Dependency", ioException);
             return null;
