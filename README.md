@@ -52,7 +52,7 @@ public final class PlayerService {
 <dependency>
   <groupId>com.github.NyanGuyMF</groupId>
   <artifactId>dependency-injector</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
 </dependency>
 ```
 ### Gradle
@@ -62,7 +62,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.github.NyanGuyMF:dependency-injector:1.0.2'
+  implementation 'com.github.NyanGuyMF:dependency-injector:1.0.3'
 }
 ```
 [DependencyUrl]: https://github.com/NyanGuyMF/dependency-injector/blob/940ceed8fcc17ceaac79a460beb3642fc13835e7/src/main/java/voidpointer/spigot/framework/di/Dependency.java#L24
