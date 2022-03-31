@@ -31,13 +31,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class Injector {
+    private static final Field[] EMPTY = new Field[0];
+
     public static void inject(final JavaPlugin plugin) {
+        inject(plugin, false);
+    }
+    public static void inject(final JavaPlugin plugin, final boolean verbose) {
         Map<String, Object> dependencies = findDependencies(plugin);
         if (dependencies.isEmpty()) {
             plugin.getLogger().info("No @Dependency found for injection.");
             return;
         }
-        Map<Field, String> injectTargets = findInjectTargets(plugin);
+        Map<Field, String> injectTargets = findInjectTargets(plugin, verbose);
         if (injectTargets == null)
             return;
         inject(dependencies, injectTargets, plugin.getLogger());
@@ -70,13 +75,14 @@ public final class Injector {
                 new Object[]{entry.getKey(), entry.getValue()});
     }
 
-    private static Map<Field, String> findInjectTargets(final JavaPlugin plugin) {
+    private static Map<Field, String> findInjectTargets(final JavaPlugin plugin, final boolean verbose) {
         ImmutableSet<ClassInfo> classes = getClasses(plugin);
         if (classes == null)
             return null;
         Map<Field, String> injectTargets = Collections.synchronizedMap(new HashMap<>());
-        classes.parallelStream().map(info -> Pair.of(info.load(), info.load().getDeclaredFields())).forEach(pair -> {
-            for (Field field : pair.second) {
+        classes.parallelStream().forEach(info -> {
+            Field[] fields = getFields(info, plugin.getLogger(), verbose);
+            for (Field field : fields) {
                 if (!field.isAnnotationPresent(Autowired.class))
                     continue;
                 if (!Modifier.isStatic(field.getModifiers())) {
@@ -89,6 +95,18 @@ public final class Injector {
             }
         });
         return injectTargets;
+    }
+
+    private static Field[] getFields(final ClassInfo info, final Logger logger, final boolean verbose) {
+        try {
+            return info.load().getDeclaredFields();
+        } catch (final NoClassDefFoundError noClassDefFoundError) {
+            if (verbose) {
+                logger.log(Level.INFO, "Class {0} not found, skipping injection for {1} class",
+                        new Object[]{noClassDefFoundError.getMessage(), info.getSimpleName()});
+            }
+            return EMPTY;
+        }
     }
 
     private static void reportNotStatic(final Logger logger, final Field field) {
